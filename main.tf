@@ -117,7 +117,32 @@ resource "aws_instance" "myapp-server" {
     associate_public_ip_address = true
     key_name = aws_key_pair.myapp-ssh-key.key_name
 
-    user_data = file("entry_script.sh")
+    #user_data = file("entry_script.sh")
+
+    # provisioner "remote-exec" {
+    #     inline = [
+    #       "export ENV=Dev",
+    #       "mkdir test_dir"
+    #     ]
+    # }
+    provisioner "file" {
+        source = "entry_script.sh"
+        destination = "/home/ec2-user/entry_script-on-ec2.sh"
+      }
+    provisioner "remote-exec" {
+        script = file("entry_script.sh")
+    }
+    provisioner "local-exec" {
+        command = "echo ${self.public_ip} > output.txt"
+      
+    }
+
+    connection {
+      type = "ssh"
+      host = self.public_ip
+      user = "ec2-user"
+      private_key = file(var.private_key_pair)
+    }
 
     tags = {
         Name = "${var.env_prefix}-server"

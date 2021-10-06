@@ -20,3 +20,4 @@ variable "env_prefix" {}
 variable "my-ip" {}
 variable "instance_type" {}
 variable "public_key-pair" {}
+variable "private_key_pair" {}
